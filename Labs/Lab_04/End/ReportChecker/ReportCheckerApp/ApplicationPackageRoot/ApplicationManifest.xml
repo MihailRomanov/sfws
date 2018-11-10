@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="ReportCheckerAppType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ReportCheckerServicePkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="DigitalSignatureCheckerServicePkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ValueRangeCheckerServicePkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <DefaultServices>
+    <Service Name="ReportCheckerService">
+      <StatelessService ServiceTypeName="ReportCheckerServiceType" InstanceCount="-1">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="DigitalSignatureCheckerService">
+      <StatelessService ServiceTypeName="DigitalSignatureCheckerServiceType" InstanceCount="-1">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="ValueRangeCheckerService">
+      <StatelessService ServiceTypeName="ValueRangeCheckerServiceType" InstanceCount="-1">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+  </DefaultServices>
+</ApplicationManifest>

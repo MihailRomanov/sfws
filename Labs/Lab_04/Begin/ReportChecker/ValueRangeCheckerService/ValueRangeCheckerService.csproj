@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <Platforms>AnyCPU;x64</Platforms>
+		<RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="PackageRoot\ServiceManifest.xml" />
+    <None Remove="PackageRoot\ValueRangePkg\Settings.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="PackageRoot\ServiceManifest.xml" />
+    <Content Include="PackageRoot\ValueRangePkg\Settings.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.93.1" />
+    <PackageReference Include="Microsoft.ServiceFabric" Version="6.3.187" />
+    <PackageReference Include="Microsoft.ServiceFabric.Services" Version="3.2.187" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,80 @@
+﻿using System.Fabric;
+using System.Fabric.Description;
+using ClosedXML.Excel;
+using System.Collections.Generic;
+using System.Linq;
+using Common;
+using System.IO;
+using Microsoft.ServiceFabric.Services.Runtime;
+using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+
+namespace ValueRangeCheckerService
+{
+	public class ValueRangeChecker : StatelessService, IChecker
+	{
+		const string ValueRangeCheckerConfigPackageName = "ValueRangePkg";
+		const string ConfigurationSectionName = "ValueRange";
+
+		const string WorksheetName = "Operations";
+		const string TableName = "Operations";
+		const string IdColumnName = "Operation ID";
+		string columnName;
+
+		double min, max;
+
+		public ValueRangeChecker(StatelessServiceContext context) : base(context)
+		{
+			var activationContext = context.CodePackageActivationContext;
+			var package = activationContext.GetConfigurationPackageObject(ValueRangeCheckerConfigPackageName);
+			Init(package.Settings);
+
+			activationContext.ConfigurationPackageModifiedEvent += ConfigurationPackageModified;
+		}
+
+		private void ConfigurationPackageModified(object sender, PackageModifiedEventArgs<ConfigurationPackage> e)
+		{
+			if (e.NewPackage.Description.Name == ValueRangeCheckerConfigPackageName)
+				Init(e.NewPackage.Settings);
+		}
+		
+		public void Init(ConfigurationSettings configurationSettings)
+		{
+			var section = configurationSettings.Sections[ConfigurationSectionName];
+
+			this.columnName = section.Parameters["ValueRangeColumn"].Value;
+			this.min = double.Parse(section.Parameters["ValueRangeMin"].Value);
+			this.max = double.Parse(section.Parameters["ValueRangeMax"].Value);
+		}
+
+		public Task<CheckResult> CheckAsync(byte[] buffer)
+		{
+			var file = new MemoryStream(buffer);
+
+			var result = new CheckResult { Success = true, Errors = new List<string>() };
+
+			using (var wb = new XLWorkbook(file))
+			{
+				var reportTable = wb.Worksheet(WorksheetName).Table(TableName);
+				var dt = reportTable.AsNativeDataTable();
+
+				var selectdRows = dt.Select($"Not (({min} <= {columnName}) AND ({columnName} <= {max}))");
+
+				if (selectdRows.Any())
+				{
+					result.Success = false;
+					result.Errors.AddRange(selectdRows.Select(
+						dr => $"Error in string with id '{dr[IdColumnName]}'"));
+				}
+			}
+
+			return Task.FromResult(result);
+		}
+
+		protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+		{
+			return this.CreateServiceRemotingInstanceListeners();
+		}
+	}
+}

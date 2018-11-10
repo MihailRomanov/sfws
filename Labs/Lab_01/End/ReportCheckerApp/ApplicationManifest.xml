@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<ApplicationManifest ApplicationTypeName="ReportCheckerAppType"
+										 ApplicationTypeVersion="1.0.0"
+										 xmlns="http://schemas.microsoft.com/2011/01/fabric">
+	<ServiceManifestImport>
+		<ServiceManifestRef ServiceManifestName="ReportCheckerServicePkg" 
+												ServiceManifestVersion="1.0.0" />
+	</ServiceManifestImport>
+	<DefaultServices>
+		<Service Name="ReportCheckerService">
+			<StatelessService InstanceCount="-1" ServiceTypeName="ReportCheckerServiceType">
+				<SingletonPartition/>
+			</StatelessService>
+		</Service>
+	</DefaultServices>
+</ApplicationManifest>
